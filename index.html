@@ -226,13 +226,13 @@ function renderHeatmap(d){
     const sp=r.spend||[], gn=r.ganho||[];
     const cells=r.roi.map((v,i)=>{
       if(v!==null&&v!==undefined){const c=roiColor(v);return `<td class="hcell" style="background:${c.bg};color:${c.fg}">${c.txt}</td>`;}
-      if((sp[i]||0)===0 && (gn[i]||0)>0){return `<td class="hcell" title="Pausada gerando receita (sem custo): R$ ${(gn[i]||0).toFixed(2)}" style="background:#1f9d57;color:#fff;font-weight:700">∞</td>`;}
+      if((sp[i]||0)===0 && (gn[i]||0)>0){return `<td class="hcell" title="Pausada gerando receita (sem custo): R$ ${(gn[i]||0).toFixed(2)}" style="background:#1f9d57;color:#5eead4;font-weight:700;font-size:8.5px">R$${((gn[i]||0)*0.9).toFixed(2)}</td>`;}
       if(sp.slice(0,i).some(s=>s>0)){return `<td class="hcell" title="Pausada" style="background:rgba(148,163,184,.16);color:#cbd5e1">⏸</td>`;}
       return `<td class="hcell" style="background:rgba(100,116,139,.12);color:#5b6b85">—</td>`;
     }).join('');
     let cmHtml;
     if(r.roi_month!==null&&r.roi_month!==undefined){const cm=roiColor(r.roi_month);cmHtml=`<td class="hcell hmonth" style="background:${cm.bg};color:${cm.fg};font-weight:700">${cm.txt}</td>`;}
-    else if((r.gtot||0)>0){cmHtml=`<td class="hcell hmonth" title="Lucro sem custo: R$ ${((r.gtot||0)*0.9).toFixed(2)}" style="background:#1f9d57;color:#fff;font-weight:700">∞</td>`;}
+    else if((r.gtot||0)>0){cmHtml=`<td class="hcell hmonth" title="Lucro sem custo: R$ ${((r.gtot||0)*0.9).toFixed(2)}" style="background:#1f9d57;color:#5eead4;font-weight:700;font-size:8.5px">R$${((r.gtot||0)*0.9).toFixed(2)}</td>`;}
     else cmHtml=`<td class="hcell hmonth" style="background:rgba(100,116,139,.12);color:#5b6b85">—</td>`;
     const accent={active:'#22c55e',earning:'#2dd4bf',inactive:'#5b6b85',suspended:'#e0625e'}[r.status]||'#5b6b85';
     const susp=r.suspended?` <span style="color:#e0625e;opacity:.85;font-size:10px;font-weight:700;border:1px solid rgba(224,98,94,.5);border-radius:4px;padding:1px 5px;white-space:nowrap">⛔</span>`:'';
@@ -269,7 +269,7 @@ function renderHeatmap(d){
       <span class="lg" style="background:#e0625e"></span><span>&lt;0%</span>
       <span class="lg" style="background:#f2c14e"></span><span>0–50%</span>
       <span class="lg" style="background:#1f9d57"></span><span>&gt;50%</span>
-      <span style="margin-left:10px;color:#1f9d57;font-weight:700">∞</span><span>Pausada gerando receita (lucro s/ custo)</span>
+      <span style="margin-left:10px;color:#5eead4;font-weight:700;font-size:11px">R$</span><span>Pausada gerando receita (mostra o lucro sem custo)</span>
       <span style="margin-left:10px;color:#cbd5e1">⏸</span><span>Pausada</span>
       <span style="margin-left:10px;color:#5b6b85">—</span><span>Sem dado</span>
     </div>`;
