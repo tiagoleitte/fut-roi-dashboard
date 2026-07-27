@@ -342,7 +342,7 @@ window.setHeatMonth=function(v){window.heatMonth=v; if(_heatDay) renderHeatmap(_
 window.setDtSort=function(k){var s=window._dtSort||{key:'roi',dir:-1}; if(s.key===k){s.dir=-s.dir;}else{s={key:k,dir:(k==='name'?1:-1)};} window._dtSort=s; if(window._curIdx!=null) render(window._curIdx);};
 window.setDrSort=function(k){var s=window._drSort||{key:'roi',dir:-1}; if(s.key===k){s.dir=-s.dir;}else{s={key:k,dir:(k==='name'?1:-1)};} window._drSort=s; if(window._curIdx!=null) render(window._curIdx);};
 window.setCtSort=function(k){var s=window._ctSort||{key:'roi',dir:-1}; if(s.key===k){s.dir=-s.dir;}else{s={key:k,dir:((k==='name'||k==='country')?1:-1)};} window._ctSort=s; if(window._curIdx!=null) render(window._curIdx);};
-window.setDtCat=function(v){window._dtCat=v; if(window._curIdx!=null) render(window._curIdx);};
+window.setDtCat=function(v){window._dtCat=v; if(window._curIdx!=null) render(window._curIdx);}; window.setDtStatus=function(v){window._dtStatus=v; if(window._curIdx!=null) render(window._curIdx);};
 window.setHeatStatus=function(v){window.heatStatus=v; if(_heatDay) renderHeatmap(_heatDay);};
 function renderHeatmap(d){
   _heatDay=d;
@@ -477,7 +477,7 @@ function render(idx){
     if(m){const p=_paisNome[m[1].toUpperCase()]; return 'Relacionamento · '+(p||m[1].toUpperCase());}
     return 'Outras';
   };
-  const _cf=d.campaigns.filter(c=> _cat==='all'?true:(_cat==='carros'?_isCarro(c):(_cat==='relac'?!_isCarro(c):_dtGrp(c)===_cat)));
+  const _dtStatusV=window._dtStatus||'all';const _cf=d.campaigns.filter(c=> (_cat==='all'?true:(_cat==='carros'?_isCarro(c):(_cat==='relac'?!_isCarro(c):_dtGrp(c)===_cat))) && (_dtStatusV==='all'?true:(_dtStatusV==='active'?(c.spend>0):(c.spend<=0))) );const _dtStatusSel='<span style="display:inline-flex;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden">'+['all','active','paused'].map(v=>'<button onclick="setDtStatus(\''+v+'\')" style="background:'+(_dtStatusV===v?'#3b82f6':'transparent')+';color:'+(_dtStatusV===v?'#fff':'var(--muted)')+';border:none;padding:6px 13px;font-size:12px;font-weight:600;cursor:pointer">'+(v==='all'?'Todas':v==='active'?'Ativas':'Pausadas')+'</button>').join('')+'</span>';
   const _sm=k=>_cf.reduce((s,c)=>s+(c[k]||0),0);
   const _ft=(_cat==='all')?t:{n_total:_cf.length,spend:_sm('spend'),custo_adj:_sm('custo_adj'),cap_rev:_sm('cap_rev'),broad_rev:_sm('broad_rev'),ganho:_sm('ganho'),ganho_adj:_sm('ganho_adj'),lucro:_sm('lucro'),contatos:_sm('contatos'),imp_adx:_sm('imp_adx'),roi:0,cpc_contato:null,rpm:0};
   if(_cat!=='all'){_ft.roi=_ft.custo_adj>0?_ft.lucro/_ft.custo_adj*100:0;_ft.cpc_contato=_ft.contatos>0?_ft.spend/_ft.contatos:null;_ft.rpm=_ft.imp_adx>0?_ft.ganho/_ft.imp_adx*1000:0;}
@@ -550,7 +550,7 @@ function render(idx){
      <div class="card"><h3>ROI por campanha (%)</h3><div class="chart-box"><canvas id="roiChart"></canvas></div></div>
      <div class="card"><h3>Custo (+13%) × Ganho (−10%) por campanha</h3><div class="chart-box"><canvas id="cgChart"></canvas></div></div>
    </div>
-   <div class="card full" style="margin-bottom:20px"><h3 style="display:flex;align-items:center;justify-content:space-between;gap:10px"><span>Detalhamento por campanha</span><span style="font-weight:400">${dtCatSel}</span></h3>
+   <div class="card full" style="margin-bottom:20px"><h3 style="display:flex;align-items:center;justify-content:flex-start;gap:14px;flex-wrap:wrap"><span>Detalhamento por campanha</span><span style="font-weight:400">${dtCatSel}</span>${_dtStatusSel}<span style="color:var(--muted);font-size:12px;font-weight:400">(${_cf.length})</span></h3>
      <div class="scroll"><table><thead><tr>${dtHead}</tr></thead><tbody>${rows}${totalRow}</tbody></table></div></div>
    <div class="grid2">
      <div class="card"><h3>CAP × BROAD — receita empilhada</h3><div class="chart-box"><canvas id="cbChart"></canvas></div></div>
