@@ -863,6 +863,7 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
     const box=document.createElement('div');box.className='ccards-wrap';box.style.marginTop='22px';
     box.innerHTML='<div class="ccards-title">Países ativos</div><div class="ccards">'+cards+'</div>';
     wrap.appendChild(box);                                                // abaixo da tabela de detalhamento
+    try{const nts=[...wrap.querySelectorAll('.notice')];const rn=nts.find(n=>/Receita = coluna/.test(n.textContent));if(rn){rn.style.marginTop='14px';wrap.appendChild(rn);}}catch(e){}  // move aviso da receita p/ depois dos paises ativos
   }
 
   // ROI acumulado (desde o último reset da página) — coluna após "ROI · 3 dias ant."
