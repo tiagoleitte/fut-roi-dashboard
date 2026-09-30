@@ -449,7 +449,7 @@ function renderHeatmap(d){
     else cmHtml=`<td class="hcell hmonth" style="background:rgba(100,116,139,.12);color:#5b6b85">—</td>`;
     const accent={active:'#22c55e',earning:'#2dd4bf',inactive:'#5b6b85',suspended:'#e0625e'}[r.status]||'#5b6b85';
     const susp=r.suspended?` <span style="color:#e0625e;opacity:.85;font-size:10px;font-weight:700;border:1px solid rgba(224,98,94,.5);border-radius:4px;padding:1px 5px;white-space:nowrap">⛔</span>`:'';
-    return `<tr style="${hidden?'display:none':''}"><td class="hname" title="${r.name}" style="border-left:3px solid ${accent}">${r.name}${susp}${["6023","1613","6090"].includes(String(r.id))?' <span class="badge" style="background:#14304f;color:#8fc0ff;font-size:10px" title="teste desktop-only">desk</span>':''}</td>${cells}${cmHtml}</tr>`;
+    return `<tr style="${hidden?'display:none':''}"><td class="hname" title="${r.name}" style="border-left:3px solid ${accent}">${r.name}${susp}${["6023","1613","6090"].includes(String(r.id))?' <span class="badge" style="background:#14304f;color:#8fc0ff;font-size:10px" title="teste desktop-only">desk</span>':''}${["25237","2974","9705","0150","6090","01319"].includes(String(r.id))?' <span class="badge" style="background:#3a2a08;color:#fbbf24;font-size:10px" title="teste madrugada: copia -PRO 0h-9h (fuso SP), desde 30/09">PRO</span>':''}</td>${cells}${cmHtml}</tr>`;
   };
   const grp=(id,icon,title,arr,col)=>{
     if(!arr.length) return '';
@@ -589,7 +589,7 @@ function render(idx){
     const zero=c.matched===false?'zero':'';
     const flag=c.matched===false?' <span class="badge b-red" title="sem página no AdX">s/ AdX</span>':'';
     let extra=msg?`<td>${num(c.contatos)}</td><td>${brl(c.cpc_contato)}</td>`:'';
-    return `<tr class="${zero}"><td title="${c.name}">${c.name}${flag}${["6023","1613","6090"].includes(String(c.id))?' <span class="badge" style="background:#14304f;color:#8fc0ff" title="teste desktop-only">desk</span>':''}</td><td class="muted">${c.id}</td>
+    return `<tr class="${zero}"><td title="${c.name}">${c.name}${flag}${["6023","1613","6090"].includes(String(c.id))?' <span class="badge" style="background:#14304f;color:#8fc0ff" title="teste desktop-only">desk</span>':''}${["25237","2974","9705","0150","6090","01319"].includes(String(c.id))?' <span class="badge" style="background:#3a2a08;color:#fbbf24" title="teste madrugada: copia -PRO 0h-9h (fuso SP), desde 30/09">PRO</span>':''}</td><td class="muted">${c.id}</td>
       <td>${brl(c.spend)}</td><td>${brl(c.custo_adj)}</td><td style="color:#4f9dff;font-weight:600">${brl(c.cap_rev)}</td><td style="color:#c44fd6;font-weight:600">${brl(c.broad_rev)}</td>${(()=>{const t=(c.cap_rev||0)+(c.broad_rev||0);return '<td class="cctr">'+(t?Math.round((c.broad_rev||0)/t*100)+'%':'\u2014')+'</td>';})()}
       <td>${brl(c.ganho)}</td><td>${brl(c.ganho_adj)}</td><td class="${lc}">${brl(c.lucro)}</td>
       <td class="cctr"><span class="badge ${rc}">${pct(c.roi)}</span></td>${_diasCell(c.dias_run,c.id)}${extra}<td>${brl(c.rpm)}</td>${_r3Cell(c.id)}${actCell(c.id,false,d.partial)}</tr>`;}).join('');
