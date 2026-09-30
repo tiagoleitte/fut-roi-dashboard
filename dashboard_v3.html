@@ -540,6 +540,11 @@ function renderTestePro(d){
   const tcpa=T.cv?T.g/T.cv:null,tcpm=T.imp?T.g/T.imp*1000:null,tocpa=T.ocv?T.og/T.ocv:null,tocpm=T.oimp?T.og/T.oimp*1000:null;
   const text=T.hasCap?T.cap-T.capb:null, tcob=(text!=null&&T.g)?(text*0.9)/(T.g*1.13)*100:null, tdl=T.hasL?T.lp-T.lb:null;
   const total='<tr class="total"><td style="text-align:left">TOTAL (6)</td><td></td><td>'+brl(T.g)+'</td><td>'+(T.hasCap?brl(T.cap):'—')+'</td><td>'+brl(T.capb)+'</td><td class="'+cls(text)+'">'+sgn(text)+'</td><td>'+(tcob==null?'—':Math.round(tcob)+'%')+'</td><td>'+T.cv+'</td><td>'+(tcpa==null?'—':brl(tcpa))+'</td><td>'+(tcpm==null?'—':brl(tcpm))+'</td><td>'+(tocpa==null?'—':brl(tocpa))+'</td><td>'+(tocpm==null?'—':brl(tocpm))+'</td><td class="'+cls(T.lp)+'">'+(T.hasL?brl(T.lp):'—')+'</td><td>'+brl(T.lb)+'</td><td class="'+cls(tdl)+'" style="font-weight:700">'+sgn(tdl)+'</td></tr>';
+  const qrows=P.map(p=>{const r=(D.pages||{})[p.key]||{};const ext=(r.cap_h!=null)?r.cap_h-p.base_cap_h:null;const dl=(r.pg_lucro!=null)?r.pg_lucro-p.base_lucro:null;
+    return '<tr><td style="text-align:left;white-space:nowrap">'+p.name+' <span class="muted" style="font-size:10.5px">'+p.country+'</span></td><td>'+brl(r.pro_g)+'</td><td class="'+cls(ext)+'" style="font-weight:600">'+sgn(ext)+'</td><td class="'+cls(dl)+'" style="font-weight:700">'+sgn(dl)+'</td></tr>';}).join('');
+  const quick='<div class="card" style="margin-bottom:14px;max-width:620px"><h3>Visão rápida — '+sel+(D.hora&&D.hora!=='fech'?' (parcial '+D.hora+')':'')+'</h3><table><thead><tr><th style="text-align:left">Página</th><th>Gasto cópia</th><th title="cap 0h–8h de hoje menos a média 23–29/09 nos mesmos blocos">Cap extra</th><th title="lucro da página (cópia+original) menos a média diária 23–29/09">Δ lucro</th></tr></thead><tbody>'+qrows+
+    '<tr class="total"><td style="text-align:left">TOTAL (6)</td><td>'+brl(T.g)+'</td><td class="'+cls(text)+'">'+sgn(text)+'</td><td class="'+cls(tdl)+'">'+sgn(tdl)+'</td></tr></tbody></table>'+
+    '<div class="muted" style="font-size:11px;margin-top:6px">Cap extra = receita de chegada a mais na madrugada (0h–8h) vs base. Δ lucro = quanto a página inteira lucrou a mais que antes do teste (já inclui o broad).</div></div>';
   const kpis='<div class="kpis">'+
     '<div class="kpi"><div class="lab">Gasto das cópias</div><div class="val">'+brl(T.g)+'</div><div class="sub">'+T.cv+' conversas · '+(tcpa==null?'—':brl(tcpa))+'/conv</div></div>'+
     '<div class="kpi"><div class="lab">CPM cópia × original</div><div class="val">'+(tcpm==null?'—':brl(tcpm))+'</div><div class="sub">original: '+(tocpm==null?'—':brl(tocpm))+'</div></div>'+
@@ -552,7 +557,7 @@ function renderTestePro(d){
   const evo='<div class="card" style="margin-top:14px"><h3>Evolução — Δ lucro da página vs base (e gasto da cópia)</h3><div class="scroll"><table><thead><tr><th style="text-align:left">Página</th>'+days.map(k=>'<th>'+k+(d.days[k].hora&&d.days[k].hora!=='fech'?'*':'')+'</th>').join('')+'</tr></thead><tbody>'+
     P.map(p=>'<tr><td style="text-align:left">'+p.name+'</td>'+days.map(k=>{const r=(d.days[k].pages||{})[p.key]||{};const dl=r.pg_lucro!=null?r.pg_lucro-p.base_lucro:null;return '<td class="'+cls(dl)+'">'+sgn(dl)+'<div class="muted" style="font-size:10px">cópia '+brl(r.pro_g)+'</div></td>';}).join('')+'</tr>').join('')+
     '</tbody></table></div><div class="muted" style="font-size:11px;margin-top:6px">* parcial. Base = média diária '+((d.cfg&&d.cfg.baseline)||'')+'. Julgar só d3–d4 (curva-J).</div></div>';
-  W.innerHTML=head+btns+kpis+'<div class="card"><h3>Cópias -PRO — '+sel+(D.hora&&D.hora!=='fech'?' (parcial '+D.hora+')':' (fechado)')+'</h3><div class="scroll"><table>'+th+'<tbody>'+rows+total+'</tbody></table></div>'+
+  W.innerHTML=head+btns+kpis+quick+'<div class="card"><h3>Cópias -PRO — '+sel+(D.hora&&D.hora!=='fech'?' (parcial '+D.hora+')':' (fechado)')+'</h3><div class="scroll"><table>'+th+'<tbody>'+rows+total+'</tbody></table></div>'+
     (D.facecap?'':'<div class="notice" style="margin-top:8px">Sem relatório Facecap por hora neste dia — cap 0–8h indisponível.</div>')+'</div>'+evo;
 }
 function render(idx){
