@@ -589,7 +589,7 @@ function render(idx){
   let notice='';
   if(d.is_monthly){notice+=`<div class="notice blue">📅 <b>Visão mensal</b> — ROI acumulado por campanha. ${d.period_note||''}</div>`;}
   if(d.date_mismatch){notice+=`<div class="notice">⚠️ <b>Atenção — datas diferentes:</b> a planilha do Facebook é de <b>${d.fb_date}</b>, mas o relatório do Google Ad Manager é de <b>${d.adx_date}</b>. O ROI cruza custo e receita de dias distintos. ${t.n_unmatched>0?`<b>${t.n_unmatched} campanha(s)</b> não têm página correspondente no AdX (ganho R$ 0) — provavelmente por rodarem em data sem receita no relatório. Para ROI exato, envie o relatório do AdX do mesmo dia.`:''}</div>`;}
-  if(!d.partial&&d.update_time){notice+=`<div class="notice blue">✅ Dia fechado · última atualização em <b>${d.update_time}</b></div>`;}
+  if(!d.partial&&d.update_time){notice+=`<div class="notice blue">✅ Dia fechado</div>`;}
   if(d.partial){notice+=`<div class="notice">⏳ Última atualização às <b>${d.update_time||'—'}</b>${d.gam_lag?` · <span style="color:#e0625e;font-weight:700">GAM congelado — receita AdX não atualizou</span>`:''}</div>`;}
   if(d.costs_zero){notice+=`<div class="notice">💸 <b>Custos do Meta zerados</b> neste relatório (gasto R$ 0 em todas as campanhas) — comum em parcial cedo no dia. Lucro = ganho ajustado; <b>ROI fica indefinido</b> (sem custo) e aparece como "—". Reenvie quando o gasto popular.</div>`;}
   notice+=`<div class="notice blue">ℹ️ Receita = coluna "Receita total de CPM e de CPC" do GAM (export sem coluna específica de Ad Exchange). Impressões AdX = "Total de impressões". ID da página = nº de 4 dígitos do nome da campanha = últimos 4 dígitos do ID na utm_source (facecap_/facebroad_).</div>`;
