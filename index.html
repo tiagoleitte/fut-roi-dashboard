@@ -421,7 +421,7 @@ function renderHeatmap(d){
   const _hGrp=r=>{
     if(r.country==='Direto') return 'Direto';
     if(_hIsCarro(r)) return (/CMX|CARRO-?ME?X/i.test(''+r.name)||r.country==='Mexico')?'Carros · MEX':'Carros · EUA';
-    const m=(''+r.name).match(/RELAC-?([A-Z]{2,4})/i);
+    if(/RELAC-?EUA-?ES/i.test(''+r.name)||(''+r.country).toUpperCase()==='RELACIONAMENTO EUA-ES') return 'Relacionamento · EUA-ES';const m=(''+r.name).match(/RELAC-?([A-Z]{2,4})/i);
     if(m){const p=_hPais[m[1].toUpperCase()];return 'Relacionamento · '+(p||m[1].toUpperCase());}if(r.country){var _CC={'RELACIONAMENTO EUA':'EUA','EUA':'EUA','HOLANDA':'Holanda','CANADÁ':'Canadá','INGLATERRA':'Inglaterra','AUSTRALIA':'Austrália','AUSTRÁLIA':'Austrália','ESPANHA':'Espanha','IRLANDA':'Irlanda','LUXEMBURGO':'Luxemburgo','MALTA':'Malta','COLOMBIA':'Colômbia','COLÔMBIA':'Colômbia','CHILE':'Chile','PERU':'Peru','MEXICO':'México','MÉXICO':'México','PORTO RICO EN':'Porto Rico'}[(''+r.country).toUpperCase()];if(_CC)return 'Relacionamento · '+_CC;}
     return 'Outras';
   };
@@ -601,7 +601,7 @@ function render(idx){
   const _paisNome={EUA:'EUA',CAN:'Canadá',ESP:'Espanha',LUX:'Luxemburgo',ENG:'Inglaterra',UK:'Inglaterra',IRL:'Irlanda',AUS:'Austrália',MX:'México',NL:'Holanda',HOL:'Holanda',CHI:'Chile',COL:'Colômbia',MEX:'México',MLT:'Malta',PER:'Peru'};
   const _dtGrp=c=>{
     if(_isCarro(c)) return (/CMX|CARRO-?ME?X/i.test(''+c.name)||c.country==='Mexico')?'Carros · MEX':'Carros · EUA';
-    const m=(''+c.name).match(/RELAC-?([A-Z]{2,4})/i);
+    if(/RELAC-?EUA-?ES/i.test(''+c.name)||(''+c.country).toUpperCase()==='RELACIONAMENTO EUA-ES') return 'Relacionamento · EUA-ES';const m=(''+c.name).match(/RELAC-?([A-Z]{2,4})/i);
     if(m){const p=_paisNome[m[1].toUpperCase()]; return 'Relacionamento · '+(p||m[1].toUpperCase());}if(c.country){var _CC={'RELACIONAMENTO EUA':'EUA','EUA':'EUA','HOLANDA':'Holanda','CANADÁ':'Canadá','INGLATERRA':'Inglaterra','AUSTRALIA':'Austrália','AUSTRÁLIA':'Austrália','ESPANHA':'Espanha','IRLANDA':'Irlanda','LUXEMBURGO':'Luxemburgo','MALTA':'Malta','COLOMBIA':'Colômbia','COLÔMBIA':'Colômbia','CHILE':'Chile','PERU':'Peru','MEXICO':'México','MÉXICO':'México','PORTO RICO EN':'Porto Rico'}[(''+c.country).toUpperCase()];if(_CC)return 'Relacionamento · '+_CC;}
     return 'Outras';
   };
