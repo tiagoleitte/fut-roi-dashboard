@@ -574,7 +574,7 @@ function render(idx){
   if(_d.is_actions){ renderActions(_d); return; }
   if(_d.is_available){ renderAvailable(_d); return; }
   if(_d.is_teste_pro){ renderTestePro(_d); return; }
-  const d=(window._aggDay&&_d.campaigns)?window._aggDay:((_d.campaigns&&window.augmentDay)?window.augmentDay(DASHBOARD.days[idx]):DASHBOARD.days[idx]);const t=d.totals;const msg=d.is_messaging;
+  const _d0=(window._aggDay&&_d.campaigns)?window._aggDay:((_d.campaigns&&window.augmentDay)?window.augmentDay(DASHBOARD.days[idx]):DASHBOARD.days[idx]);const d=(window.acctFilter?window.acctFilter(_d0):_d0);const t=d.totals;const msg=d.is_messaging;
   const lucroCls=t.lucro>=0?'pos':'neg',roiCls=(t.roi===null)?'':(t.roi>=0?'pos':'neg');
   let kpis=`
    <div class="kpi"><div class="lab">Gasto FB (bruto)</div><div class="val">${brl(t.spend)}</div><div class="sub">Custo +13%: ${brl(t.custo_adj)}</div></div>
@@ -771,9 +771,9 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
     const days=RD().filter(x=>x.id>=fromId&&x.id<=toId);
     const agg={};let msg=false;
     for(const day of days){ if(day.is_messaging)msg=true;
-      for(const c of (day.campaigns||[])){ const a=agg[c.id]||(agg[c.id]={id:c.id,name:c.name,country:c.country,spend:0,cap_rev:0,broad_rev:0,ganho:0,imp_adx:0,fb_imp:0,contatos:0});
+      for(const c of (day.campaigns||[])){ const a=agg[c.id]||(agg[c.id]={id:c.id,name:c.name,country:c.country,spend:0,custo_adj:0,cap_rev:0,broad_rev:0,ganho:0,imp_adx:0,fb_imp:0,contatos:0,accs:{}});a.custo_adj+=(c.custo_adj!=null?c.custo_adj:(c.spend||0)*1.13);String(c.account||'FUT2').split('+').forEach(k=>{if((c.spend||0)>0||!Object.keys(a.accs).length)a.accs[k]=1;});
         a.spend+=c.spend||0;a.cap_rev+=c.cap_rev||0;a.broad_rev+=c.broad_rev||0;a.ganho+=c.ganho||0;a.imp_adx+=c.imp_adx||0;a.fb_imp+=c.fb_imp||0;a.contatos+=c.contatos||0;a.name=c.name;a.country=c.country; } }
-    const camps=Object.values(agg).map(a=>{a.custo_adj=R2(a.spend*1.13);a.ganho_adj=R2(a.ganho*0.9);a.lucro=R2(a.ganho_adj-a.custo_adj);a.roi=a.custo_adj>0?R2(a.lucro/a.custo_adj*100):null;a.rpm=a.imp_adx>0?R2(a.ganho/a.imp_adx*1000):null;a.cpc_contato=a.contatos>0?R2(a.spend/a.contatos):null;a.imp_adx=Math.round(a.imp_adx);a.fb_imp=Math.round(a.fb_imp);a.spend=R2(a.spend);a.cap_rev=R2(a.cap_rev);a.broad_rev=R2(a.broad_rev);a.ganho=R2(a.ganho);a.matched=(a.ganho>0||a.imp_adx>0);return a;});
+    const camps=Object.values(agg).map(a=>{a.custo_adj=R2(a.custo_adj);a.account=Object.keys(a.accs).sort().join('+')||'FUT2';delete a.accs;a.ganho_adj=R2(a.ganho*0.9);a.lucro=R2(a.ganho_adj-a.custo_adj);a.roi=a.custo_adj>0?R2(a.lucro/a.custo_adj*100):null;a.rpm=a.imp_adx>0?R2(a.ganho/a.imp_adx*1000):null;a.cpc_contato=a.contatos>0?R2(a.spend/a.contatos):null;a.imp_adx=Math.round(a.imp_adx);a.fb_imp=Math.round(a.fb_imp);a.spend=R2(a.spend);a.cap_rev=R2(a.cap_rev);a.broad_rev=R2(a.broad_rev);a.ganho=R2(a.ganho);a.matched=(a.ganho>0||a.imp_adx>0);return a;});
     const S=k=>camps.reduce((s,c)=>s+(c[k]||0),0);
     const t={spend:R2(S('spend')),custo_adj:R2(S('custo_adj')),cap_rev:R2(S('cap_rev')),broad_rev:R2(S('broad_rev')),ganho:R2(S('ganho')),ganho_adj:R2(S('ganho_adj')),lucro:R2(S('lucro')),imp_adx:Math.round(S('imp_adx')),contatos:Math.round(S('contatos')),n_total:camps.length,n_lucro:camps.filter(c=>c.lucro>0).length};
     t.roi=t.custo_adj>0?R2(t.lucro/t.custo_adj*100):null;
@@ -781,6 +781,21 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
   }
   window.aggregateRange=aggregateRange;
 
+  // ---- filtro por CONTA DE ANÚNCIOS (FUT2 = FUT 2 WAVE em BRL; FUT3USD = FUT 3 USD) ----
+  const ACCT_LBL={FUT2:'FUT 2 WAVE',FUT3USD:'FUT 3 USD'};
+  window._acct=window._acct||'all';
+  try{const v=localStorage.getItem('fut_acct');if(v)window._acct=v;}catch(e){}
+  function acctFilter(day){
+    if(!day||!day.campaigns||window._acct==='all')return day;
+    const camps=day.campaigns.filter(c=>String(c.account||'FUT2').split('+').indexOf(window._acct)>=0);
+    const S=k=>camps.reduce((s,c)=>s+(c[k]||0),0);
+    const t=Object.assign({},day.totals,{spend:R2(S('spend')),custo_adj:R2(S('custo_adj')),cap_rev:R2(S('cap_rev')),broad_rev:R2(S('broad_rev')),ganho:R2(S('ganho')),ganho_adj:R2(S('ganho_adj')),lucro:R2(S('lucro')),imp_adx:Math.round(S('imp_adx')),contatos:Math.round(S('contatos')),n_total:camps.filter(c=>c.spend>0).length,n_lucro:camps.filter(c=>c.spend>0&&c.lucro>0).length});
+    t.roi=t.custo_adj>0?R2(t.lucro/t.custo_adj*100):null;
+    const gg=t.cap_rev+t.broad_rev;t.cap_split=gg?R2(t.cap_rev/gg*100):0;t.broad_split=gg?R2(t.broad_rev/gg*100):0;
+    return Object.assign({},day,{campaigns:camps,totals:t});
+  }
+  window.acctFilter=acctFilter;
+  function acctList(){const s=new Set(['FUT2']);for(const d of RD())for(const c of d.campaigns)String(c.account||'FUT2').split('+').forEach(k=>s.add(k));return Array.from(s);}
   function ensureRender(){let idx=window._curIdx;const d=DASHBOARD.days[idx];if(window._aggDay&&(!d||!d.campaigns))idx=lastDayIdx();window._curIdx=idx;render(idx);}
   function applyRange(mode){
     const rd=RD();
@@ -803,11 +818,13 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
       +'<div class="rb-seg" id="rbSeg"><button data-p="single" class="on">Hoje</button><button data-p="1">Ontem</button><button data-p="3">3 dias</button><button data-p="7">7 dias</button><button data-p="0">Mês</button></div>'
       +'<span class="rb-sub">De</span><select id="rbDe">'+opts+'</select>'
       +'<span class="rb-sub">Até</span><select id="rbAte">'+opts+'</select>'
+      +'<span class="rb-sub">Conta</span><select id="rbAcct"><option value="all">Todas as contas</option>'+acctList().map(k=>'<option value="'+k+'">'+(ACCT_LBL[k]||k)+'</option>').join('')+'</select>'
       +'<span class="rb-info" id="rbInfo"></span>';
     if(rd.length){document.getElementById('rbDe').value=rd[0].id;document.getElementById('rbAte').value=rd[rd.length-1].id;}
     document.querySelectorAll('#rbSeg button').forEach(b=>b.onclick=()=>applyRange(b.dataset.p));
     document.getElementById('rbDe').onchange=()=>applyRange('deate');
     document.getElementById('rbAte').onchange=()=>applyRange('deate');
+    const _ac=document.getElementById('rbAcct');if(_ac){_ac.value=window._acct;if(_ac.value!==window._acct){window._acct='all';_ac.value='all';}_ac.onchange=()=>{window._acct=_ac.value;try{localStorage.setItem('fut_acct',_ac.value);}catch(e){}ensureRender();};}
   }
 
   function customizeSelect(sel){
@@ -893,7 +910,7 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
     const have=new Set(day.campaigns.map(c=>String(c.id)));
     const extra=[];
     for(const r of hm.rows){const id=String(r.id);if(have.has(id))continue;
-      extra.push({id:id,name:r.name||id,country:r.country||'?',spend:0,custo_adj:0,cap_rev:0,broad_rev:0,ganho:0,ganho_adj:0,lucro:0,roi:null,rpm:null,imp_adx:0,fb_imp:0,contatos:0,cpc_contato:null,dias_run:null,matched:false});}
+      extra.push({id:id,name:r.name||id,country:r.country||'?',account:r.account||'FUT2',spend:0,custo_adj:0,cap_rev:0,broad_rev:0,ganho:0,ganho_adj:0,lucro:0,roi:null,rpm:null,imp_adx:0,fb_imp:0,contatos:0,cpc_contato:null,dias_run:null,matched:false});}
     return Object.assign({},day,{campaigns:day.campaigns.concat(extra)});
   }
   window.augmentDay=augmentDay;
@@ -908,7 +925,7 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
     const kpis=wrap.querySelector('.kpis');if(!kpis)return;               // só views de dia
     if(wrap.querySelector('.ccards-wrap'))return;
     const cur=DASHBOARD.days[window._curIdx];
-    const day=(window._aggDay&&cur&&cur.campaigns)?window._aggDay:cur;
+    const _dy=(window._aggDay&&cur&&cur.campaigns)?window._aggDay:cur;const day=(window.acctFilter?window.acctFilter(_dy):_dy);
     if(!day||!day.campaigns)return;
     const by={};
     for(const c of day.campaigns){if(!(c.spend>0))continue;let k=c.country||'?';if(k==='Mexico'){k=/CARRO/i.test(c.name||'')?'México Carro':'México Relac.';}const o=by[k]||(by[k]={lucro:0,custo:0,n:0,cap:0,broad:0,ganho:0,imp:0});
