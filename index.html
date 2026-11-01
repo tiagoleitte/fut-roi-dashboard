@@ -725,7 +725,7 @@ window.buildSidebar=function(){
   tabsEl.innerHTML='';
   monthKeys.forEach(mk=>{
     const hdr=document.createElement('div'); hdr.className='navgrp';
-    hdr.innerHTML='<span>'+(collapsed[mk]?'▸':'▾')+'</span> '+(monthName[mk]||mk);
+    hdr.innerHTML='<span>'+(collapsed[mk]?'▸':'▾')+'</span> '+(monthName[mk]||(['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][parseInt(mk.slice(5),10)-1]||mk));
     hdr.onclick=()=>{collapsed[mk]=!collapsed[mk]; window.buildSidebar();};
     tabsEl.appendChild(hdr);
     if(!collapsed[mk]){
