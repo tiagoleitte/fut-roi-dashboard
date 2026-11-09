@@ -1239,6 +1239,10 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
   body>header{position:sticky;top:0;z-index:80;background:#0b1120;box-shadow:0 1px 0 #1f2a3d}
   #rangebar{position:sticky!important;top:var(--hdrH,84px);z-index:70!important;background:#0b1120!important;box-shadow:0 1px 0 #1f2a3d}
   .tabs{top:var(--hdrH,84px)!important;max-height:calc(100vh - var(--hdrH,84px))!important}
+  #tbUpd{margin-left:4px;display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:10px;border:1px solid #243049;background:#0d1525;color:#94a3b8;font-size:12.5px;white-space:nowrap}
+  #tbUpd b{color:#e2e8f0;font-weight:600}
+  #tbUpd .dot{width:7px;height:7px;border-radius:50%;background:#22c55e}
+  #tbUpd.par .dot{background:#fbbf24;box-shadow:0 0 0 3px rgba(251,191,36,.15)}
   /* barra do topo */
   #rangebar{gap:12px!important;padding:16px 26px 12px!important;position:relative;z-index:30}
   .tb-grp{display:flex;align-items:center;gap:8px}
@@ -1413,7 +1417,7 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
     const hasData=(tt.contatos||0)>0;
     w.querySelectorAll('.kpi').forEach(k=>{ const lb=k.querySelector('.lab'); if(!lb) return; const l=lb.textContent.trim().toLowerCase();
       if(/^contatos/.test(l)){ if(!hasData) k.remove(); else if(isAdImp){ lb.textContent='AdImpressions (Meta)'; const sb=k.querySelector('.sub'); if(sb) sb.textContent='resultados do pixel'; } }
-      else if(/custo m[ée]dio\s*\/\s*contato/.test(l)){ if(!hasData) k.remove(); else if(isAdImp){ lb.textContent='Custo / AdImpression'; const sb=k.querySelector('.sub'); if(sb) sb.textContent='gasto Meta ÷ AdImpressions'; } } });
+      else if(/custo m[ée]dio\s*\/\s*contato/.test(l)){ if(!hasData) k.remove(); else if(isAdImp){ lb.textContent='Custo / AdImpression'; const sb=k.querySelector('.sub'); if(sb) sb.textContent='gasto Meta ÷ AdImpressions'; const vv=k.querySelector('.val'); if(vv&&tt.contatos) vv.textContent='R$ '+(tt.spend/tt.contatos).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); } } });
     w.querySelectorAll('table').forEach(tb=>{ const ths=[...tb.querySelectorAll('thead th, tr:first-child th')]; const ix=ths.map((t,i)=>/^(contatos|r\$\/contato)$/i.test(t.textContent.trim())?i:-1).filter(i=>i>=0);
       if(!ix.length) return;
       if(hasData){ const hr0=ths[0].parentNode, ci=[...hr0.children].findIndex(t=>/^(r\$\/contato|custo\/adimp)$/i.test(t.textContent.trim())), tot=tb.querySelector('tr.total');
@@ -1421,12 +1425,22 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
         if(isAdImp) ix.forEach(i=>{ const t=ths[i]; t.textContent=/^contatos$/i.test(t.textContent.trim())?'AdImp':'Custo/AdImp'; t.title=/AdImp$/.test(t.textContent)?'AdImpressions (resultados do pixel no Meta)':'gasto Meta ÷ AdImpressions'; }); return; }
       const hr=ths[0].parentNode; const pos=ix.map(i=>[...hr.children].indexOf(ths[i])).sort((a,b)=>b-a);
       tb.querySelectorAll('tr').forEach(tr=>{ pos.forEach(pi=>{ const c=tr.children[pi]; if(c) c.remove(); }); }); });
+    // 5) "Última atualização" sai do corpo e vai para a barra do topo, na linha do período/conta
+    { const bar=document.getElementById('rangebar'); let up=document.getElementById('tbUpd');
+      if(bar&&!up){ up=document.createElement('div'); up.id='tbUpd'; bar.appendChild(up); }
+      const nt=[...w.querySelectorAll('.notice')].find(n=>/última atualização/i.test(n.textContent));
+      if(up){ if(nt){ const partial=/⏳/.test(nt.textContent); const m=nt.textContent.match(/(\d{2}\/\d{2}\s+)?\d{1,2}:\d{2}/);
+          up.className=partial?'par':''; up.innerHTML='<span class="dot"></span>'+(partial?'Parcial · atualizado às ':'Dia fechado · atualizado em ')+'<b>'+(m?m[0]:'')+'</b>'; up.style.display=''; nt.remove(); }
+        else { const dd=window._aggDay?null:DASHBOARD.days[window._curIdx];
+          if(window._aggDay){ up.className=''; up.innerHTML='<span class="dot" style="background:#60a5fa"></span>Período somado'; up.style.display=''; }
+          else if(dd&&dd.campaigns){ up.className=''; const ut=dd.update_time?String(dd.update_time):''; up.innerHTML='<span class="dot"></span>Dia fechado'+(ut?' · atualizado em <b>'+ut+'</b>':''); up.style.display=''; }
+          else up.style.display='none'; } } }
     // 3) tira o bloco antigo de Tráfego Direto (tem menu próprio)
     const td=[...w.children].find(c=>/^\s*🔗\s*Tráfego Direto/.test(c.textContent||''));
     if(td){ let n=td.nextElementSibling; td.remove(); while(n&&!n.classList.contains('ccards-wrap')&&!n.classList.contains('notice')){ const nx=n.nextElementSibling; n.remove(); n=nx; } }
   }
   const _prevRender=window.render;
-  window.render=function(i){ _prevRender(i); try{ const d=DASHBOARD.days[window._curIdx]; if(window._aggDay||(d&&d.campaigns)) tidyChatbot(); }catch(e){ console.error(e); } };
+  window.render=function(i){ _prevRender(i); try{ const d=DASHBOARD.days[window._curIdx]; if(window._aggDay||(d&&d.campaigns)) tidyChatbot(); else { const u=document.getElementById('tbUpd'); if(u) u.style.display='none'; } }catch(e){ console.error(e); } };
   render=window.render;
   const _hh=()=>{ const h=document.querySelector('body>header'); if(h) document.documentElement.style.setProperty('--hdrH',h.offsetHeight+'px'); }; _hh(); window.addEventListener('resize',_hh);
   try{ buildTopBar(); }catch(e){ console.error(e); }
