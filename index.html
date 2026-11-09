@@ -1215,6 +1215,12 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
   .sb-sub:hover{color:#f1f5f9;background:rgba(255,255,255,.035)}.sb-sub.on{color:#fff}.sb-sub.on::before{background:#3b82f6}
   .sb-div{height:1px;background:#1d2840;margin:14px 6px 14px}
   #evtip{position:fixed;z-index:10000;pointer-events:none;opacity:0;transition:opacity .12s;max-width:300px;background:#0b1120;border:1px solid #2a3756;color:#e2e8f0;padding:8px 11px;border-radius:9px;font-size:11.5px;font-weight:600;line-height:1.5;white-space:pre-line;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+  /* barras de rolagem iguais às do ConectaBlog */
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:hsl(217 26% 18%);border-radius:8px}
+  ::-webkit-scrollbar-thumb:hover{background:hsl(217 26% 26%)}
+  ::-webkit-scrollbar-track,::-webkit-scrollbar-corner{background:transparent}
+  @supports (-moz-appearance:none){*{scrollbar-width:thin;scrollbar-color:hsl(217 33% 18%) transparent}}
   /* barra do topo */
   #rangebar{gap:12px!important;padding:16px 26px 12px!important;position:relative;z-index:30}
   .tb-grp{display:flex;align-items:center;gap:8px}
