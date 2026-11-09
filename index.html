@@ -679,7 +679,7 @@ function _escTag(id,d){ return ''; }
 function _evChip(id,d){ const dayId=_evDay(d); if(!dayId) return ''; _evCss(); let h='';
   const es=((DASHBOARD.eventos||{}).escala||[]).filter(e=>String(e.id)===String(id)&&e.date<=dayId).sort((x,y)=>x.date<y.date?1:-1);
   if(es.length){ const e=es[0], n=_evDiff(dayId,e.date);
-    if(n<=7){ const cls=n<=2?'ev-amber':(n<=4?'ev-green':'ev-gray'), pct=e.de?Math.round((e.para/e.de-1)*100):null;
+    if(n<=7){ const cls='ev-purple', pct=e.de?Math.round((e.para/e.de-1)*100):null;
       const tip='Escalada · '+n+'º dia do aumento\nOrçamento '+_evBrl(e.de)+' → '+_evBrl(e.para)+' em '+_evFmt(e.date);
       h+='<span class="ev-chip '+cls+'" data-tip="'+tip.replace(/"/g,'&quot;')+'">⬆ '+(pct!=null?'+'+pct+'%':'')+' <i>·</i> d'+n+'</span>'; } }
   const rv=_reativDate(id,dayId);
@@ -690,7 +690,7 @@ function _evModal(id,name,dayId){ _evCss();
         rv=(E.reativacao||[]).filter(e=>String(e.id)===String(id)).sort((a,b)=>a.date<b.date?1:-1);
   let evh='';
   es.forEach(e=>{ const n=dayId?_evDiff(dayId,e.date):null; const pct=e.de?Math.round((e.para/e.de-1)*100):null;
-    evh+='<div class="ev-li"><span class="dt">'+_evFmt(e.date)+'</span><span class="ev-chip ev-amber" style="margin:0">⬆ '+(pct!=null?'+'+pct+'%':'')+'</span><b>'+_evBrl(e.de)+' → '+_evBrl(e.para)+'</b><span class="nt">'+(n&&n>0?'d'+n+' · ':'')+(e.nota||'')+'</span></div>'; });
+    evh+='<div class="ev-li"><span class="dt">'+_evFmt(e.date)+'</span><span class="ev-chip ev-purple" style="margin:0">⬆ '+(pct!=null?'+'+pct+'%':'')+'</span><b>'+_evBrl(e.de)+' → '+_evBrl(e.para)+'</b><span class="nt">'+(n&&n>0?'d'+n+' · ':'')+(e.nota||'')+'</span></div>'; });
   rv.forEach(e=>{ const n=dayId?_evDiff(dayId,e.date):null;
     evh+='<div class="ev-li"><span class="dt">'+_evFmt(e.date)+'</span><span class="ev-chip ev-purple" style="margin:0">↻ Reativada</span><span class="nt">'+(n&&n>0?n+'º dia · ':'')+(e.nota||'')+'</span></div>'; });
   if(!evh) evh='<div class="ev-empty">Nenhuma escala ou reativação registrada.</div>';
@@ -1453,6 +1453,10 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
     // 6) botões de alternância (Todas/Ativas/Pausadas etc.) no estilo ConectaBlog: fundo escuro + pílula clara no ativo
     w.querySelectorAll('span[style*="overflow:hidden"]').forEach(sp=>{ const bs=sp.querySelectorAll(':scope>button'); if(bs.length<2) return; sp.classList.add('seg-dark');
       bs.forEach(b=>{ const bg=(b.getAttribute('style')||'')+' '+b.className; b.classList.toggle('seg-on',/var\(--blue\)|#3b82f6|rgb\(59, 130, 246\)|\bon\b|active/.test(bg)); }); });
+    // 6b) 'Nº dia' (maturação 1–3 dias) vira 'Nd' em azul, sem caixa — cabe na coluna Dias
+    w.querySelectorAll('table td span').forEach(sp=>{ const m=/^(\d+)º dia$/.exec((sp.textContent||'').trim()); if(!m) return;
+      sp.textContent=m[1]+'d'; sp.style.background='transparent'; sp.style.padding='0'; sp.style.fontWeight='400'; sp.style.fontSize='12.5px';
+      if(!sp.getAttribute('data-tip')&&!sp.title) sp.title='campanha em maturação (1–3 dias)'; });
     // 7) variação vs dia anterior embaixo de cada valor (só na visão de 1 dia)
     if(!window._aggDay){ const cur=DASHBOARD.days[window._curIdx];
       if(cur&&cur.campaigns&&/^\d{4}-\d\d-\d\d$/.test(String(cur.id))){
