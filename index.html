@@ -756,6 +756,9 @@ function _campFacelift(d){
     { const W={'campanha':290,'página (id)':86,'dias':64,'evento':130,'roi · 3 dias ant.':190,'roi acum.':96,'ações':120,'roi':92}, DEF=112;
       const hs=[...tb.querySelectorAll('tr:first-child th, thead th')]; let tot=0;
       hs.forEach(h=>{ const k=h.textContent.replace(/[▼▲]/g,'').trim().toLowerCase(); const wd=W[k]||DEF; h.style.width=wd+'px'; h.style.minWidth=wd+'px'; tot+=wd; });
+      // coluna Página (ID) escondida (pedido do Tiago 09/11) — continua no DOM porque outras funções leem o ID dela; o ID aparece no popup ao clicar no nome
+      const pi=hs.findIndex(h=>/^p[aá]gina \(id\)$/i.test(h.textContent.trim()));
+      if(pi>=0){ tot-=86; tb.querySelectorAll('tr').forEach(tr=>{ const c=tr.children[pi]; if(c) c.style.display='none'; }); }
       tb.style.tableLayout='fixed'; tb.style.width=tot+'px'; tb.style.minWidth='100%'; }
     tb.querySelectorAll('tbody tr').forEach(tr=>{ const t0=tr.children[0]; if(!t0||tr.classList.contains('total')||t0.dataset.fl) return;
       const full=t0.getAttribute('title')||''; const m=full.match(/RELAC-([A-Z]{2,4}(?:-ES)?)-(\d{3,6})-(.+)$/); if(!m) return;
