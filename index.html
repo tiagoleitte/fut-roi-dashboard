@@ -1387,6 +1387,11 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
     // 2) tira a tabela CAP × BROAD (o gráfico empilhado fica em linha única)
     const tb=cardBy(/^CAP × BROAD — tabela/); const emp=cardBy(/^CAP × BROAD — receita/);
     if(tb){ tb.remove(); solo(emp,260); }
+    // 4) tira Contatos e R$/contato (o export do Meta não traz conversas iniciadas → sempre 0)
+    w.querySelectorAll('.kpi').forEach(k=>{ const l=(k.querySelector('.lab')||k).textContent.trim().toLowerCase(); if(/^contatos|custo m[ée]dio\s*\/\s*contato/.test(l)) k.remove(); });
+    w.querySelectorAll('table').forEach(tb=>{ const ths=[...tb.querySelectorAll('thead th, tr:first-child th')]; const ix=ths.map((t,i)=>/^(contatos|r\$\/contato)$/i.test(t.textContent.trim())?i:-1).filter(i=>i>=0);
+      if(!ix.length) return; const hr=ths[0].parentNode; const pos=ix.map(i=>[...hr.children].indexOf(ths[i])).sort((a,b)=>b-a);
+      tb.querySelectorAll('tr').forEach(tr=>{ pos.forEach(pi=>{ const c=tr.children[pi]; if(c) c.remove(); }); }); });
     // 3) tira o bloco antigo de Tráfego Direto (tem menu próprio)
     const td=[...w.children].find(c=>/^\s*🔗\s*Tráfego Direto/.test(c.textContent||''));
     if(td){ let n=td.nextElementSibling; td.remove(); while(n&&!n.classList.contains('ccards-wrap')&&!n.classList.contains('notice')){ const nx=n.nextElementSibling; n.remove(); n=nx; } }
