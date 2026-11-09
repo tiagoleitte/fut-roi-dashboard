@@ -1243,6 +1243,17 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
   #tbUpd b{color:#e2e8f0;font-weight:600}
   #tbUpd .dot{width:7px;height:7px;border-radius:50%;background:#22c55e}
   #tbUpd.par .dot{background:#fbbf24;box-shadow:0 0 0 3px rgba(251,191,36,.15)}
+  /* camadas mais escuras dentro dos cards (estilo ConectaBlog) */
+  #wrap .card .scroll{background:#0a0f1b;border:1px solid #1d2840;border-radius:12px}
+  #wrap .card .chart-box{background:#0a0f1b;border:1px solid #1d2840;border-radius:12px;padding:12px 10px 6px;box-sizing:border-box}
+  table.camp-tbl th{background:#0c1322!important}
+  #wrap .seg-dark{background:#0a0f1b!important;border:1px solid #1d2840!important;border-radius:10px!important;padding:3px!important;gap:2px!important}
+  #wrap .seg-dark button{background:transparent!important;color:#94a3b8!important;border:none!important;border-radius:7px!important;padding:5px 12px!important;font-weight:500!important}
+  #wrap .seg-dark button.seg-on{background:#f1f5f9!important;color:#0b1120!important;font-weight:600!important}
+  #wrap .seg-dark button:not(.seg-on):hover{color:#f1f5f9!important;background:rgba(255,255,255,.05)!important}
+  /* variação vs dia anterior embaixo do valor */
+  table.camp-tbl td .dl{display:block;margin-top:3px;font-size:10.5px;font-weight:400;line-height:1.2;color:#6b7a93;white-space:nowrap}
+  table.camp-tbl td .dl.up{color:#22c55e}table.camp-tbl td .dl.dn{color:#ef4444}table.camp-tbl td .dl.nu{color:#8a97ad}
   /* barra do topo */
   #rangebar{gap:12px!important;padding:16px 26px 12px!important;position:relative;z-index:30}
   .tb-grp{display:flex;align-items:center;gap:8px}
@@ -1435,6 +1446,24 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
           if(window._aggDay){ up.className=''; up.innerHTML='<span class="dot" style="background:#60a5fa"></span>Período somado'; up.style.display=''; }
           else if(dd&&dd.campaigns){ up.className=''; const ut=dd.update_time?String(dd.update_time):''; up.innerHTML='<span class="dot"></span>Dia fechado'+(ut?' · atualizado em <b>'+ut+'</b>':''); up.style.display=''; }
           else up.style.display='none'; } } }
+    // 6) botões de alternância (Todas/Ativas/Pausadas etc.) no estilo ConectaBlog: fundo escuro + pílula clara no ativo
+    w.querySelectorAll('span[style*="overflow:hidden"]').forEach(sp=>{ const bs=sp.querySelectorAll(':scope>button'); if(bs.length<2) return; sp.classList.add('seg-dark');
+      bs.forEach(b=>{ const bg=(b.getAttribute('style')||'')+' '+b.className; b.classList.toggle('seg-on',/var\(--blue\)|#3b82f6|rgb\(59, 130, 246\)|\bon\b|active/.test(bg)); }); });
+    // 7) variação vs dia anterior embaixo de cada valor (só na visão de 1 dia)
+    if(!window._aggDay){ const cur=DASHBOARD.days[window._curIdx];
+      if(cur&&cur.campaigns&&/^\d{4}-\d\d-\d\d$/.test(String(cur.id))){
+        let prev=null; for(let i=window._curIdx-1;i>=0;i--){ const x=DASHBOARD.days[i]; if(x&&x.campaigns&&/^\d{4}-\d\d-\d\d$/.test(String(x.id))&&x.id<cur.id){ prev=x; break; } }
+        if(prev){ const pc=Array.isArray(prev.campaigns)?prev.campaigns:Object.values(prev.campaigns), pm={}; pc.forEach(c=>{ pm[String(c.id)]=c; });
+          const COL={'gasto fb':['spend','nu'],'custo +13%':['custo_adj','nu'],'receita cap':['cap_rev','g'],'receita broad':['broad_rev','g'],'ganho bruto':['ganho','g'],'ganho −10%':['ganho_adj','g'],'lucro':['lucro','g'],'roi':['roi','pp'],'adimp':['contatos','g'],'custo/adimp':['cpc_contato','inv'],'rpm':['rpm','g']};
+          w.querySelectorAll('table').forEach(tb=>{ const hr=tb.querySelector('tr'); if(!hr) return; const hs=[...hr.children].map(h=>h.textContent.replace(/[▼▲]/g,'').trim().toLowerCase());
+            if(hs.indexOf('gasto fb')<0||!/p[aá]gina/.test(hs[1]||'')) return;
+            tb.querySelectorAll('tr').forEach(tr=>{ if(tr.querySelector('th')||tr.classList.contains('total')) return; const id=(tr.children[1]&&tr.children[1].textContent||'').trim(); const pv=pm[id]; if(!pv) return;
+              const cc=(Array.isArray(cur.campaigns)?cur.campaigns:Object.values(cur.campaigns)).find(c=>String(c.id)===id); if(!cc) return;
+              const val=(c,k)=>k==='lucro'?((c.ganho_adj||0)-(c.custo_adj||0)):(k==='cpc_contato'?((c.contatos>0)?(c.spend/c.contatos):null):c[k]);
+              hs.forEach((h,i)=>{ const m=COL[h]; const td=tr.children[i]; if(!m||!td||td.querySelector('.dl')) return; const a=val(cc,m[0]), b=val(pv,m[0]); if(a==null||b==null) return;
+                let txt,cls; if(m[1]==='pp'){ const d=a-b; txt=(d>=0?'▲ ':'▼ ')+Math.abs(d).toFixed(1).replace('.',',')+' pp'; cls=d>=0?'up':'dn'; }
+                else { if(!b) return; const d=(a-b)/Math.abs(b)*100; txt=(d>=0?'▲ ':'▼ ')+Math.abs(d).toFixed(1).replace('.',',')+'%'; cls=m[1]==='nu'?'nu':(m[1]==='inv'?(d<=0?'up':'dn'):(d>=0?'up':'dn')); }
+                const el=document.createElement('span'); el.className='dl '+cls; el.textContent=txt; el.title='vs '+String(prev.id).slice(8,10)+'/'+String(prev.id).slice(5,7); td.appendChild(el); }); }); }); } } }
     // 3) tira o bloco antigo de Tráfego Direto (tem menu próprio)
     const td=[...w.children].find(c=>/^\s*🔗\s*Tráfego Direto/.test(c.textContent||''));
     if(td){ let n=td.nextElementSibling; td.remove(); while(n&&!n.classList.contains('ccards-wrap')&&!n.classList.contains('notice')){ const nx=n.nextElementSibling; n.remove(); n=nx; } }
