@@ -654,15 +654,31 @@ function renderDireto4(D){
 function _evDay(d){ return (d&&d.id&&/^\d{4}-\d{2}-\d{2}$/.test(String(d.id)))?String(d.id):null; }
 function _reativDate(id,dayId){ if(!dayId) return null; const ev=((DASHBOARD.eventos||{}).reativacao||[]); let b=null;
   ev.forEach(e=>{ if(String(e.id)===String(id)&&e.date<=dayId&&(!b||e.date>b)) b=e.date; }); return b; }
-function _escTag(id,d){ const dayId=_evDay(d); if(!dayId) return '';
-  const ev=((DASHBOARD.eventos||{}).escala||[]).filter(e=>String(e.id)===String(id)&&e.date<=dayId);
-  if(!ev.length) return ''; ev.sort((x,y)=>x.date<y.date?1:-1); const e=ev[0];
-  const n=Math.round((Date.parse(dayId)-Date.parse(e.date))/864e5)+1; if(n>7) return '';
-  const pct=e.de?Math.round((e.para/e.de-1)*100):null;
-  const col=n<=2?'#f59e0b':(n<=4?'#22c55e':'#94a3b8'), bg=n<=2?'rgba(245,158,11,.15)':(n<=4?'rgba(34,197,94,.15)':'rgba(148,163,184,.14)');
-  const dt=e.date.slice(8,10)+'/'+e.date.slice(5,7);
-  const tip='orçamento '+e.de+' → '+e.para+' em '+dt+(e.nota?' · '+e.nota:'')+(n<=2?' · d1–d2: vale do aprendizado, não julgar':(n<=4?' · d3–d4: hora de julgar':''));
-  return ' <span class="badge" style="background:'+bg+';color:'+col+'" title="'+tip.replace(/"/g,'&quot;')+'">⬆ '+(pct!=null?'+'+pct+'%':'escala')+' · d'+n+'</span>'; }
+function _evCss(){ if(document.getElementById('evcss')) return; const st=document.createElement('style'); st.id='evcss';
+  st.textContent='#wrap table td:first-child{min-width:300px}'
+   +'.ev-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;margin-top:7px}'
+   +'.ev-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:7px;font-size:11px;font-weight:700;line-height:1.35;white-space:nowrap;border:1px solid transparent}'
+   +'.ev-pill i{font-style:normal;opacity:.55;font-weight:600}'
+   +'.ev-meta{color:#8a97ad;font-size:11.5px;font-weight:500;white-space:nowrap}.ev-meta b{color:#cbd5e1;font-weight:700}'
+   +'.ev-amber{background:rgba(245,158,11,.12);color:#fbbf24;border-color:rgba(245,158,11,.28)}'
+   +'.ev-green{background:rgba(34,197,94,.12);color:#4ade80;border-color:rgba(34,197,94,.28)}'
+   +'.ev-gray{background:rgba(148,163,184,.10);color:#a3b0c4;border-color:rgba(148,163,184,.24)}'
+   +'.ev-purple{background:rgba(168,85,247,.12);color:#c084fc;border-color:rgba(168,85,247,.28)}';
+  document.head.appendChild(st); }
+function _escTag(id,d){ const dayId=_evDay(d); if(!dayId) return ''; _evCss();
+  const fmt=x=>x.slice(8,10)+'/'+x.slice(5,7), brl=v=>'R$ '+Math.round(v), diff=x=>Math.round((Date.parse(dayId)-Date.parse(x))/864e5)+1;
+  let rows='';
+  const es=((DASHBOARD.eventos||{}).escala||[]).filter(e=>String(e.id)===String(id)&&e.date<=dayId).sort((x,y)=>x.date<y.date?1:-1);
+  if(es.length){ const e=es[0], n=diff(e.date);
+    if(n<=7){ const pct=e.de?Math.round((e.para/e.de-1)*100):null;
+      const cls=n<=2?'ev-amber':(n<=4?'ev-green':'ev-gray'), fase=n<=2?'aprendendo':(n<=4?'avaliar agora':'');
+      const tip=('Orçamento '+brl(e.de)+' → '+brl(e.para)+' em '+fmt(e.date)+(e.nota?' · '+e.nota:'')+(n<=2?' · d1–d2: vale do aprendizado, não julgar':(n<=4?' · d3–d4: hora de avaliar':''))).replace(/"/g,'&quot;');
+      rows+='<div class="ev-row" title="'+tip+'"><span class="ev-pill '+cls+'">⬆ '+(pct!=null?'+'+pct+'%':'Escala')+' <i>·</i> d'+n+'</span>'
+        +'<span class="ev-meta"><b>'+brl(e.de)+' → '+brl(e.para)+'</b>'+(fase?' · '+fase:'')+'</span></div>'; } }
+  const rv=_reativDate(id,dayId);
+  if(rv){ const n=diff(rv); if(n<=7){ rows+='<div class="ev-row" title="Reativada em '+fmt(rv)+' · curva de aprendizado recomeça"><span class="ev-pill ev-purple">↻ Reativada <i>·</i> '+n+'º dia</span>'
+      +'<span class="ev-meta">desde <b>'+fmt(rv)+'</b></span></div>'; } }
+  return rows; }
 /*EV-END*/
 function render(idx){
   const _d=DASHBOARD.days[idx];
