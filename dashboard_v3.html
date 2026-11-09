@@ -1221,9 +1221,9 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
   ::-webkit-scrollbar-thumb:hover{background:hsl(217 26% 26%)}
   ::-webkit-scrollbar-track,::-webkit-scrollbar-corner{background:transparent}
   @supports (-moz-appearance:none){*{scrollbar-width:thin;scrollbar-color:hsl(217 33% 18%) transparent}}
-  /* etiquetas: tamanho padrão = pílula do país */
-  table.camp-tbl .badge,table.camp-tbl td span[style*="border-radius"],table.camp-tbl .ev-chip,table.camp-tbl .acum-badge{font-size:9.5px!important;font-weight:800!important;padding:2px 6px!important;border-radius:5px!important;line-height:1.35!important;letter-spacing:.2px}
-  table.camp-tbl .ev-chip{gap:4px}
+  /* etiquetas da tabela: só o número colorido, sem caixa e sem negrito (pedido do Tiago 09/11) */
+  table.camp-tbl .badge,table.camp-tbl td span[style*="border-radius"],table.camp-tbl .ev-chip,table.camp-tbl .acum-badge{background:transparent!important;border:none!important;box-shadow:none!important;padding:0!important;font-size:12.5px!important;font-weight:400!important;letter-spacing:0!important;line-height:1.4!important}
+  table.camp-tbl .ev-chip{gap:4px;margin-right:10px}
   /* linha de total mais escura (destaque) */
   #wrap table tr.total td{background:#070b14!important;border-top:1px solid #2a3756!important;color:#f8fafc;font-weight:800}
   /* topo congelado (título + período) */
