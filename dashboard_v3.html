@@ -1485,6 +1485,12 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
     const td=[...w.children].find(c=>/^\s*🔗\s*Tráfego Direto/.test(c.textContent||''));
     if(td){ let n=td.nextElementSibling; td.remove(); while(n&&!n.classList.contains('ccards-wrap')&&!n.classList.contains('notice')){ const nx=n.nextElementSibling; n.remove(); n=nx; } }
   }
+  // coluna 'ROI · 3 dias ant.' vai para o lugar da AdImp (AdImp, Custo/AdImp e RPM andam 1 pra direita)
+  function _roi3Move(){ document.querySelectorAll('table').forEach(tb=>{ const hr=tb.querySelector('tr'); if(!hr) return;
+      const hs=[...hr.children].map(h=>h.textContent.replace(/[▼▲]/g,'').trim().toLowerCase());
+      const r3=hs.indexOf('roi · 3 dias ant.'), ad=hs.indexOf('adimp'); if(r3<0||ad<0||r3<ad) return;
+      tb.querySelectorAll('tr').forEach(tr=>{ const c=tr.children; if(c.length!==hs.length) return; tr.insertBefore(c[r3],c[ad]); }); }); }
+  let _r3T=null; try{ new MutationObserver(()=>{ clearTimeout(_r3T); _r3T=setTimeout(_roi3Move,30); }).observe(document.body,{childList:true,subtree:true}); }catch(e){}
   const _prevRender=window.render;
   window.render=function(i){ _prevRender(i); try{ const d=DASHBOARD.days[window._curIdx]; if(window._aggDay||(d&&d.campaigns)) tidyChatbot(); else { const u=document.getElementById('tbUpd'); if(u) u.style.display='none'; } }catch(e){ console.error(e); } };
   render=window.render;
