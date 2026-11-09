@@ -680,10 +680,10 @@ function _evChip(id,d){ const dayId=_evDay(d); if(!dayId) return ''; _evCss(); l
   const es=((DASHBOARD.eventos||{}).escala||[]).filter(e=>String(e.id)===String(id)&&e.date<=dayId).sort((x,y)=>x.date<y.date?1:-1);
   if(es.length){ const e=es[0], n=_evDiff(dayId,e.date);
     if(n<=7){ const cls=n<=2?'ev-amber':(n<=4?'ev-green':'ev-gray'), pct=e.de?Math.round((e.para/e.de-1)*100):null;
-      const tip='Escalada · '+n+'º dia do aumento\nOrçamento '+_evBrl(e.de)+' → '+_evBrl(e.para)+' em '+_evFmt(e.date)+'\n'+(n<=2?'Aprendendo: ainda não julgar':(n<=4?'Hora de avaliar o aumento':'Só referência'));
+      const tip='Escalada · '+n+'º dia do aumento\nOrçamento '+_evBrl(e.de)+' → '+_evBrl(e.para)+' em '+_evFmt(e.date);
       h+='<span class="ev-chip '+cls+'" data-tip="'+tip.replace(/"/g,'&quot;')+'">⬆ '+(pct!=null?'+'+pct+'%':'')+' <i>·</i> d'+n+'</span>'; } }
   const rv=_reativDate(id,dayId);
-  if(rv){ const n=_evDiff(dayId,rv); if(n<=7) h+='<span class="ev-chip ev-purple" data-tip="Reativada em '+_evFmt(rv)+'\n'+n+'º dia da curva nova">↻ Reativada</span>'; }
+  if(rv){ const n=_evDiff(dayId,rv); if(n<=7) h+='<span class="ev-chip ev-purple" data-tip="Reativada em '+_evFmt(rv)+'">↻ Reativada</span>'; }
   return h; }
 function _evModal(id,name,dayId){ _evCss();
   const E=DASHBOARD.eventos||{}, es=(E.escala||[]).filter(e=>String(e.id)===String(id)).sort((a,b)=>a.date<b.date?1:-1),
@@ -749,7 +749,7 @@ function _campFacelift(d){
         if(!tr.classList.contains('total')&&/^\d{3,6}$/.test(id)){ td.innerHTML=_evChip(id,d)||'<span style="color:#3f4b63">—</span>';
           // tooltip na etiqueta de dias
           const ds=tds[ci].querySelector('span'); if(ds&&!ds.dataset.tip){ const rv=_reativDate(id,dayId), txt=ds.textContent.trim();
-            if(/dia/.test(txt)) ds.setAttribute('data-tip', rv? ('Reativada em '+_evFmt(rv)+'\n'+txt+' da curva nova') : ('Em maturação\n'+txt+' de entrega desde que começou'));
+            if(/dia/.test(txt)) ds.setAttribute('data-tip', rv? ('Reativada em '+_evFmt(rv)) : 'Em maturação');
             else if(/pausada/.test(txt)) ds.setAttribute('data-tip', ds.getAttribute('title')||'Pausada'); ds.removeAttribute('title'); } }
         tds[ci].parentNode.insertBefore(td,tds[ci].nextSibling); }); }
     tb.querySelectorAll('tbody tr').forEach(tr=>{ const t0=tr.children[0]; if(!t0||tr.classList.contains('total')||t0.dataset.fl) return;
