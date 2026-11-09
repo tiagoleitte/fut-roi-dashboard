@@ -1350,20 +1350,21 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
     const sec=t=>{const s=document.createElement('div'); s.className='sb-sec'; s.textContent=t; el.appendChild(s);};
     const item=(icon,label,on,fn)=>{const it=document.createElement('div'); it.className='sb-it'+(on?' on':''); it.innerHTML=icon+'<span>'+label+'</span>'; it.onclick=fn; el.appendChild(it); return it;};
     const find=f=>special.find(o=>o.d[f]);
-    sec('Chatbot');
-    item(I.day,'Visão diária',isDayView(),()=>{ const rd=RDD(); const p=window._pick; if(p.kind==='range'){ showRange(p.from,p.to); } else { showSingle((p.id&&idxOf(p.id)>=0)?p.id:rd[rd.length-1].id); } });
+    const d4=find('is_direto4');
+    // principais (mais usados), um embaixo do outro
+    item(I.day,'Chatbot',isDayView(),()=>{ const rd=RDD(); const p=window._pick; if(p.kind==='range'){ showRange(p.from,p.to); } else { showSingle((p.id&&idxOf(p.id)>=0)?p.id:rd[rd.length-1].id); } });
+    if(d4) item(I.car,'Tráfego direto',d4.i===cur&&!window._aggDay,()=>go(d4));
+    const dv=document.createElement('div'); dv.className='sb-div'; el.appendChild(dv);
+    sec('Outros');
     const h=find('is_heatmap');
-    if(h){ const open=window._histOpen!==false; const it=item(I.hist,clean(h.d.label),h.i===cur&&!window._aggDay,()=>{ window._histOpen=!open; window.buildSidebar(); });
+    if(h){ const open=window._histOpen===true; const it=item(I.hist,clean(h.d.label),h.i===cur&&!window._aggDay,()=>{ window._histOpen=!open; window.buildSidebar(); });
       it.insertAdjacentHTML('beforeend','<span class="chev'+(open?' open':'')+'">&#9656;</span>');
       if(open) [['all','Todos'],['06','Junho'],['07','Julho']].forEach(mm=>{ const s=document.createElement('div');
         s.className='sb-sub'+((h.i===cur&&!window._aggDay)&&((window.heatMonth||'all')===mm[0])?' on':''); s.textContent=mm[1];
         s.onclick=()=>{ window.heatMonth=mm[0]; go(h); }; el.appendChild(s); }); }
-    [['is_actions',I.bolt],['is_available',I.layers],['is_teste_pro',I.moon]].forEach(([f,ic])=>{ const o=find(f); if(o) item(ic,clean(o.d.label),o.i===cur&&!window._aggDay,()=>go(o)); });
-    const dv=document.createElement('div'); dv.className='sb-div'; el.appendChild(dv);
-    sec('Tráfego direto');
-    const d4=find('is_direto4'); if(d4) item(I.car,'Carro · FUT 4',d4.i===cur&&!window._aggDay,()=>go(d4));
-    const dc=find('is_country'); if(dc) item(I.globe,'Por país (jun–jul)',dc.i===cur&&!window._aggDay,()=>go(dc));
-    /* Mensal (is_monthly) removido do menu a pedido do Tiago (09/11) */
+    const ac=find('is_actions'); if(ac) item(I.bolt,clean(ac.d.label),ac.i===cur&&!window._aggDay,()=>go(ac));
+    const dc=find('is_country'); if(dc) item(I.globe,'Direto por país (jun–jul)',dc.i===cur&&!window._aggDay,()=>go(dc));
+    /* removidos do menu a pedido do Tiago (09/11): Mensal (Jun), Páginas livres, Teste Madrugada */
     if(typeof _evTipInit==='function') try{_evTipInit();}catch(e){}
     if(window._paintTopBar) try{window._paintTopBar();}catch(e){}
   };
