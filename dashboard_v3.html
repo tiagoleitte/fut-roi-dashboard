@@ -1369,7 +1369,27 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
     if(typeof _evTipInit==='function') try{_evTipInit();}catch(e){}
     if(window._paintTopBar) try{window._paintTopBar();}catch(e){}
   };
+
+  /* ---------- limpeza da visão do Chatbot (pedido do Tiago 09/11) ---------- */
+  function tidyChatbot(){ const w=document.getElementById('wrap'); if(!w) return;
+    const cardBy=re=>[...w.querySelectorAll('.card')].find(c=>{const h=c.querySelector('h3'); return h&&re.test(h.textContent);});
+    const solo=(card,h)=>{ if(!card) return; const g=card.parentElement; if(g&&g.classList.contains('grid2')) g.style.gridTemplateColumns='1fr';
+      const cb=card.querySelector('.chart-box'); if(cb) cb.style.height=h+'px'; };
+    // 1) tira "Custo × Ganho por campanha" e deixa o ROI por campanha em linha única, mais baixo
+    const cg=cardBy(/^Custo \(\+13%\) × Ganho/); const roi=cardBy(/^ROI por campanha/);
+    if(cg){ cg.remove(); solo(roi,240); }
+    // 2) tira a tabela CAP × BROAD (o gráfico empilhado fica em linha única)
+    const tb=cardBy(/^CAP × BROAD — tabela/); const emp=cardBy(/^CAP × BROAD — receita/);
+    if(tb){ tb.remove(); solo(emp,260); }
+    // 3) tira o bloco antigo de Tráfego Direto (tem menu próprio)
+    const td=[...w.children].find(c=>/^\s*🔗\s*Tráfego Direto/.test(c.textContent||''));
+    if(td){ let n=td.nextElementSibling; td.remove(); while(n&&!n.classList.contains('ccards-wrap')&&!n.classList.contains('notice')){ const nx=n.nextElementSibling; n.remove(); n=nx; } }
+  }
+  const _prevRender=window.render;
+  window.render=function(i){ _prevRender(i); try{ const d=DASHBOARD.days[window._curIdx]; if(window._aggDay||(d&&d.campaigns)) tidyChatbot(); }catch(e){ console.error(e); } };
+  render=window.render;
   try{ buildTopBar(); }catch(e){ console.error(e); }
+  try{ if(window._curIdx!=null) render(window._curIdx); }catch(e){}
   try{ window.buildSidebar(); }catch(e){ console.error(e); }
 })();
 
