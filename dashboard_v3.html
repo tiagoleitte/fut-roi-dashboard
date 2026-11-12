@@ -805,7 +805,7 @@ function _campFacelift(d){
      +'table.camp-tbl tbody tr:nth-child(even){background:transparent}table.camp-tbl tbody tr:hover{background:rgba(59,130,246,.06)}'
      +'table.camp-tbl td:first-child{min-width:280px;max-width:340px}'
      +'table.camp-tbl td:nth-child(2):not(.pos):not(.neg){color:#5f6f8a;font-size:11.5px}'
-     +'table.camp-tbl th.ev-col,table.camp-tbl td.ev-col{text-align:center}table.camp-tbl td{overflow:hidden;text-overflow:ellipsis}'
+     +'table.camp-tbl th.ev-col,table.camp-tbl td.ev-col{text-align:center}table.camp-tbl td.ev-col{white-space:normal;overflow:visible}table.camp-tbl td.ev-col .ev-chip{display:flex;width:max-content;max-width:100%;margin:2px auto}table.camp-tbl td{overflow:hidden;text-overflow:ellipsis}'
      /* caixa padrão p/ todas as etiquetas da tabela */
      +'table.camp-tbl .badge,table.camp-tbl td span[style*="border-radius"]{border-radius:7px!important;padding:3px 9px!important;font-size:11px!important;font-weight:800!important;line-height:1.35;border:1px solid color-mix(in srgb,currentColor 32%,transparent)!important;display:inline-flex;align-items:center}'
      +'.cn1{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:650;color:#f1f5f9;line-height:1.3}'
@@ -846,7 +846,7 @@ function _campFacelift(d){
             else if(/pausada/.test(txt)) ds.setAttribute('data-tip', ds.getAttribute('title')||'Pausada'); ds.removeAttribute('title'); } }
         tds[ci].parentNode.insertBefore(td,tds[ci].nextSibling); }); }
     // larguras fixas e uniformes por coluna (pedido do Tiago 09/11: espaçamento igual)
-    { const W={'campanha':290,'página (id)':86,'conta':76,'dias':58,'evento':104,'adimp':78,'% broad':78,'roi':86,'roi · 3 dias ant.':184,'roi acum.':92,'ações':120}, DEF=104;
+    { const W={'campanha':290,'página (id)':86,'conta':76,'dias':58,'evento':150,'adimp':78,'% broad':78,'roi':86,'roi · 3 dias ant.':184,'roi acum.':92,'ações':120}, DEF=104;
       const hs=[...tb.querySelectorAll('tr:first-child th, thead th')]; let tot=0;
       hs.forEach(h=>{ const k=h.textContent.replace(/[▼▲]/g,'').trim().toLowerCase(); const wd=W[k]||DEF; h.style.width=wd+'px'; h.style.minWidth=wd+'px'; tot+=wd; });
       // coluna Página (ID) escondida (pedido do Tiago 09/11) — continua no DOM porque outras funções leem o ID dela; o ID aparece no popup ao clicar no nome
