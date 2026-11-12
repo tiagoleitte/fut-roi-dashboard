@@ -756,10 +756,10 @@ function _evChip(id,d){ const dayId=_evDay(d); if(!dayId) return ''; _evCss(); l
   if(ot.length){ const e=ot[0], n=_evDiff(dayId,e.date);
     if(n<=7){ const tip='Otimizada em '+_evFmt(e.date)+' · '+n+'º dia'+(e.nota?'\n'+e.nota:'');
       h+='<span class="ev-chip ev-purple" data-tip="'+tip.replace(/"/g,'&quot;')+'">⚙ Otimizada <i>·</i> d'+n+'</span>'; } }
-  const tf=((DASHBOARD.eventos||{}).troca_flow||[]).filter(e=>String(e.id)===String(id)&&e.date<=dayId).sort((x,y)=>x.date<y.date?1:-1);
+  const tf=((DASHBOARD.eventos||{}).troca_flow||[]).filter(e=>String(e.id)===String(id)&&_evDiff(dayId,e.date)>=0).sort((x,y)=>x.date<y.date?1:-1);
   if(tf.length){ const e=tf[0], n=_evDiff(dayId,e.date);
-    if(n<=7){ const tip='Troca de flow · d1 = '+_evFmt(e.date)+' · '+n+'º dia'+(e.nota?'\n'+e.nota:'');
-      h+='<span class="ev-chip ev-amber" data-tip="'+tip.replace(/"/g,'&quot;')+'">⇄ Troca de flow <i>·</i> d'+n+'</span>'; } }
+    if(n<=7){ const tip=(n===0?'Flow trocado hoje · d1 = '+_evFmt(e.date)+' (1º dia inteiro no flow novo)':'Troca de flow · d1 = '+_evFmt(e.date)+' · '+n+'º dia')+(e.nota?'\n'+e.nota:'');
+      h+='<span class="ev-chip ev-amber" data-tip="'+tip.replace(/"/g,'&quot;')+'">⇄ Troca de flow <i>·</i> '+(n===0?'hoje':'d'+n)+'</span>'; } }
   const rv=_reativDate(id,dayId);
   if(rv){ const n=_evDiff(dayId,rv); if(n<=7) h+='<span class="ev-chip ev-purple" data-tip="Reativada em '+_evFmt(rv)+'">↻ Reativada</span>'; }
   return h; }
