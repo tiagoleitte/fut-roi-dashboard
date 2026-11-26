@@ -1605,20 +1605,20 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
 (function(){
   function st(d){
     if(!d||!d.label||!/^\d\d\/\d\d\/\d{4}$/.test(d.label)||window._aggDay) return null;
-    if(!d.partial) return {t:'fechado',fg:'#4ade80',tip:'Carros: dia PST completo (fechou 05:00 BRT do dia seguinte)'};
+    if(!d.partial) return {t:'Dia fechado',fg:'#4ade80',tip:'Carros: dia PST completo (fechou 05:00 BRT do dia seguinte)'};
     var m=String(d.update_time||'').match(/(\d{1,2}):(\d\d)\s*$/); var hh=m?parseInt(m[1],10):12;
     var nx=d.label.split('/'); var dn=new Date(+nx[2],+nx[1]-1,+nx[0]+1); var lb=('0'+dn.getDate()).slice(-2)+'/'+('0'+(dn.getMonth()+1)).slice(-2);
-    if(hh<5) return {t:'não começou',fg:'#fbbf24',tip:'Leitura antes das 05:00 BRT: o dia dos carros (PST) ainda não começou'};
-    return {t:'aberto',fg:'#fbbf24',tip:'Carros (FUT4) em PST: gasto conta desde 05:00 BRT, receita desde 00:00. Fecha 05:00 BRT de '+lb};
+    if(hh<5) return {t:'Começa às 05h',fg:'#fbbf24',tip:'Leitura antes das 05:00 BRT: o dia dos carros (PST) ainda não começou'};
+    return {t:'Fecha às 05h de '+lb,fg:'#fbbf24',tip:'Carros (FUT4) em PST: gasto conta desde 05:00 BRT, receita desde 00:00. Fecha 05:00 BRT de '+lb};
   }
   function apply(idx){
     try{
       var D=(typeof DASHBOARD!=='undefined')?DASHBOARD:window.DASHBOARD; var d=(D&&D.days)?D.days[idx!=null?idx:window._curIdx]:null; var s=st(d); if(!s) return;
       document.querySelectorAll('td[title^="CARRO-EUA"]').forEach(function(td){
-        var nm=td.querySelector('.cn1 .nm'); if(!nm||nm.querySelector('.pstx')) return;
-        var b=document.createElement('span'); b.className='pstx'; b.title=s.tip; b.textContent=' · '+s.t;
-        b.style.cssText='color:'+s.fg+';font-weight:600;font-size:11.5px';
-        nm.appendChild(b);
+        var nm=td.querySelector('.cn2'); if(!nm||nm.querySelector('.pstx')) return;
+        var b=document.createElement('span'); b.className='pstx'; b.title=s.tip; b.textContent=s.t+' · ';
+        b.style.cssText='color:'+s.fg+';font-weight:700';
+        nm.insertBefore(b,nm.firstChild);
       });
     }catch(e){}
   }
