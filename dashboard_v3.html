@@ -1605,26 +1605,26 @@ th.acum-col,td.acum-col{text-align:center;white-space:nowrap}
 (function(){
   function st(d){
     if(!d||!d.label||!/^\d\d\/\d\d\/\d{4}$/.test(d.label)||window._aggDay) return null;
-    if(!d.partial) return {t:'✅ fechado',bg:'#0f3a24',fg:'#4ade80',tip:'Dia PST completo (fechou 05:00 BRT do dia seguinte)'};
+    if(!d.partial) return {t:'fechado',fg:'#4ade80',tip:'Carros: dia PST completo (fechou 05:00 BRT do dia seguinte)'};
     var m=String(d.update_time||'').match(/(\d{1,2}):(\d\d)\s*$/); var hh=m?parseInt(m[1],10):12;
     var nx=d.label.split('/'); var dn=new Date(+nx[2],+nx[1]-1,+nx[0]+1); var lb=('0'+dn.getDate()).slice(-2)+'/'+('0'+(dn.getMonth()+1)).slice(-2);
-    if(hh<5) return {t:'⏳ não começou',bg:'#3a2a08',fg:'#fbbf24',tip:'Leitura antes das 05:00 BRT: o dia dos carros (PST) ainda não começou'};
-    return {t:'⏳ aberto',bg:'#3a2a08',fg:'#fbbf24',tip:'Carros (FUT4) em PST: gasto conta desde 05:00 BRT, receita desde 00:00. Fecha 05:00 BRT de '+lb};
+    if(hh<5) return {t:'não começou',fg:'#fbbf24',tip:'Leitura antes das 05:00 BRT: o dia dos carros (PST) ainda não começou'};
+    return {t:'aberto',fg:'#fbbf24',tip:'Carros (FUT4) em PST: gasto conta desde 05:00 BRT, receita desde 00:00. Fecha 05:00 BRT de '+lb};
   }
   function apply(idx){
     try{
       var D=(typeof DASHBOARD!=='undefined')?DASHBOARD:window.DASHBOARD; var d=(D&&D.days)?D.days[idx!=null?idx:window._curIdx]:null; var s=st(d); if(!s) return;
       document.querySelectorAll('td[title^="CARRO-EUA"]').forEach(function(td){
-        if(td.querySelector('.pstbadge')) return;
-        var b=document.createElement('span'); b.className='badge pstbadge'; b.title=s.tip; b.textContent=s.t;
-        b.style.cssText='margin-left:6px;background:'+s.bg+';color:'+s.fg+';font-size:10.5px;padding:1px 6px;border-radius:6px;white-space:nowrap;flex-shrink:0';
-        td.appendChild(b);
+        var nm=td.querySelector('.cn1 .nm'); if(!nm||nm.querySelector('.pstx')) return;
+        var b=document.createElement('span'); b.className='pstx'; b.title=s.tip; b.textContent=' · '+s.t;
+        b.style.cssText='color:'+s.fg+';font-weight:600;font-size:11.5px';
+        nm.appendChild(b);
       });
     }catch(e){}
   }
   var _r=window.render;
   if(typeof _r==='function'){ window.render=function(idx){ var out=_r.apply(this,arguments); apply(idx); return out; }; render=window.render; }
-  var obs=new MutationObserver(function(){ apply(); }); 
+  var obs=new MutationObserver(function(){ apply(); });
   window.addEventListener('load',function(){ apply(); var w=document.querySelector('.wrap')||document.body; obs.observe(w,{childList:true,subtree:true}); });
 })();
 </script></body></html>
